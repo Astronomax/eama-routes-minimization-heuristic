@@ -3,7 +3,7 @@
 struct route *
 route_new(void)
 {
-	struct route *r = malloc(sizeof(*r)); //TODO: use mempool
+	struct route *r = xmalloc(sizeof(struct route)); //TODO: use mempool
 	rlist_create(&r->list);
 	rlist_create(&r->in_routes);
 	return r;
@@ -39,7 +39,7 @@ route_init_penalty(struct route *r)
 struct route *
 route_dup(struct route *r)
 {
-	struct route *dup = malloc(sizeof(*dup));
+	struct route *dup = xmalloc(sizeof(*dup));
 	rlist_create(&dup->list);
 	rlist_create(&dup->in_routes);
 	struct customer *c;
@@ -51,16 +51,17 @@ route_dup(struct route *r)
 	}
 	assert(rlist_first_entry(&dup->list, struct customer, in_route)->id == 0);
 	assert(rlist_last_entry(&dup->list, struct customer, in_route)->id == 0);
+	route_check(r);
 	return dup;
 }
 
 void
-route_del(struct route *r)
+route_delete(struct route *r)
 {
 	struct customer *c, *tmp;
 	rlist_foreach_entry_safe(c, &r->list, in_route, tmp) {
 		rlist_del_entry(c, in_route);
-		customer_del(c);
+		customer_delete(c);
 	}
 }
 
@@ -75,4 +76,51 @@ route_find_customer_by_id(struct route *r, int id)
 		if (id == c->id)
 			return c;
 	return NULL;
+}
+
+bool
+route_feasible(struct route *r)
+{
+	return (tw_penalty_get_penalty(r) < EPS5 && c_penalty_get_penalty(r) < EPS5);
+}
+
+double
+route_penalty(struct route *r, double alpha, double beta)
+{
+	return alpha * c_penalty_get_penalty(r) +
+	       beta * tw_penalty_get_penalty(r);
+}
+
+int
+route_len(struct route *r)
+{
+	int len = 0;
+	struct customer *c;
+	rlist_foreach_entry(c, &r->list, in_route)
+		++len;
+	return len - 2;
+}
+
+struct modification
+route_find_optimal_insertion(struct route *r, struct customer *w,
+				double alpha, double beta)
+{
+	assert(is_ejected(w));
+	struct customer *v;
+	struct modification opt_modification =
+		modification_new(INSERT, NULL, NULL);
+	double opt_penalty = INFINITY;
+	rlist_foreach_entry(v, &r->list, in_route) {
+		if (v == depot_head(r))
+			continue;
+		struct modification m = modification_new(INSERT, v, w);
+		double penalty = modification_delta(m, alpha, beta);
+		if (penalty < opt_penalty) {
+			if (penalty < EPS5)
+				return m;
+			opt_modification = m;
+			opt_penalty = penalty;
+		}
+	}
+	return opt_modification;
 }

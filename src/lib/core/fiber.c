@@ -405,7 +405,7 @@ fiber_new_ex(const struct fiber_attr *fiber_attr, fiber_func f)
 				 "fiber pool", "fiber");
 			return NULL;
 		}
-		memset(fiber, 0, sizeof(struct fiber));;
+		memset(fiber, 0, sizeof(struct fiber));
 
 		if (fiber_stack_create(fiber, fiber_attr, &cord()->slabc)) {
 			mempool_free(&cord->fiber_mempool, fiber);
@@ -456,8 +456,7 @@ fiber_destroy(struct cord *cord, struct fiber *f)
 	TRASH(f);
 }
 
-/** Free all fiber's resources and the fiber itself. */
-static void
+void
 fiber_delete(struct cord *cord, struct fiber *f)
 {
 	assert(f != &cord->sched);

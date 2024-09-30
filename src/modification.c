@@ -1,7 +1,20 @@
 #include "modification.h"
+
+#include "route.h"
+
 #include "small_extra/rlist_extra.h"
 
-int
+struct modification
+modification_new(enum modification_type type, struct customer *v, struct customer *w)
+{
+	struct modification m = {
+		type, v, w,
+		{false, 0., 0},
+	};
+	return m;
+}
+
+bool
 modification_applicable(struct modification m)
 {
 	struct route *v_route, *w_route;
@@ -11,39 +24,39 @@ modification_applicable(struct modification m)
 	switch (m.type) {
 	case TWO_OPT:
 		if (v_route == w_route)
-			return -1;
+			return false;
 		if (depot_tail(m.v->route) == m.v)
-			return -1;
+			return false;
 		if (depot_tail(m.w->route) == m.w)
-			return -1;
-		return 0;
+			return false;
+		return true;
 	case OUT_RELOCATE:
 		if (w_route == NULL)
-			return -1;
+			return false;
 	case INSERT:
 		if (m.w->id == 0)
-			return -1;
+			return false;
 		if (v_route == NULL)
-			return -1;
+			return false;
 		/**
 		 * A customer can be inserted before a depot, but only
 		 * before the one at the end of the path
 		 */
 		if (depot_head(v_route) == m.v)
-			return -1;
-		return 0;
+			return false;
+		return true;
 	case EXCHANGE:
 		if (m.v->id == 0 || m.w->id == 0)
-			return -1;
+			return false;
 		if (v_route == NULL || w_route == NULL)
-			return -1;
-		return 0;
+			return false;
+		return true;
 	case EJECT:
 		if (m.v->id == 0)
-			return -1;
+			return false;
 		if (v_route == NULL)
-			return -1;
-		return 0;
+			return false;
+		return true;
 	default:
 		unreachable();
 	}
@@ -52,7 +65,7 @@ modification_applicable(struct modification m)
 void
 modification_apply(struct modification m)
 {
-	assert(modification_applicable(m) == 0);
+	assert(modification_applicable(m));
 	struct route *v_route, *w_route;
 	v_route = m.v->route;
 	/** Possible only in the case of EJECT */
@@ -124,24 +137,33 @@ modification_apply(struct modification m)
 double
 modification_delta(struct modification m, double alpha, double beta)
 {
-	assert(modification_applicable(m) == 0);
-	switch (m.type) {
-	case TWO_OPT:
-		return alpha * tw_penalty_two_opt_penalty_delta(m.v, m.w)
-			+ beta * c_penalty_two_opt_penalty_delta(m.v, m.w);
-	case OUT_RELOCATE:
-		return alpha * tw_penalty_out_relocate_penalty_delta(m.v, m.w)
-		       + beta * c_penalty_out_relocate_penalty_delta(m.v, m.w);
-	case EXCHANGE:
-		return alpha * tw_penalty_exchange_penalty_delta(m.v, m.w)
-		       + beta * c_penalty_exchange_penalty_delta(m.v, m.w);
-	case INSERT:
-		return alpha * tw_penalty_get_insert_delta(m.v, m.w)
-		       + beta * c_penalty_get_insert_delta(m.v, m.w);
-	case EJECT:
-		return alpha * tw_penalty_get_eject_delta(m.v)
-		       + beta * c_penalty_get_eject_delta(m.v);
-	default:
-		unreachable();
+	assert(modification_applicable(m));
+	if (!m.delta_initialized) {
+		switch (m.type) {
+			case TWO_OPT:
+				m.tw_penalty_delta = tw_penalty_two_opt_penalty_delta(m.v, m.w);
+				m.c_penalty_delta = c_penalty_two_opt_penalty_delta(m.v, m.w);
+				break;
+			case OUT_RELOCATE:
+				m.tw_penalty_delta = tw_penalty_out_relocate_penalty_delta(m.v, m.w);
+				m.c_penalty_delta = c_penalty_out_relocate_penalty_delta(m.v, m.w);
+				break;
+			case EXCHANGE:
+				m.tw_penalty_delta = tw_penalty_exchange_penalty_delta(m.v, m.w);
+				m.c_penalty_delta = c_penalty_exchange_penalty_delta(m.v, m.w);
+				break;
+			case INSERT:
+				m.tw_penalty_delta = tw_penalty_get_insert_delta(m.v, m.w);
+				m.c_penalty_delta = c_penalty_get_insert_delta(m.v, m.w);
+				break;
+			case EJECT:
+				m.tw_penalty_delta = tw_penalty_get_eject_delta(m.v);
+				m.c_penalty_delta = c_penalty_get_eject_delta(m.v);
+				break;
+			default:
+				unreachable();
+		}
+		m.delta_initialized = true;
 	}
+	return alpha * m.c_penalty_delta + beta * m.tw_penalty_delta;
 }
