@@ -105,7 +105,42 @@ alloc_failure(const char *filename, int line, size_t size)
 #define xrealloc(ptr, size)	xalloc_impl((size), realloc, (ptr), (size))
 #define xstrdup(s)		xalloc_impl(strlen((s)) + 1, strdup, (s))
 #define xstrndup(s, n)		xalloc_impl((n) + 1, strndup, (s), (n))
+#define xaligned_alloc(size, align) \
+		xalloc_impl((size), aligned_alloc, (align), (size))
 #define xmempool_alloc(p)	xalloc_impl((p)->objsize, mempool_alloc, (p))
+#define xregion_alloc(p, size)	xalloc_impl((size), region_alloc, (p), (size))
+#define xregion_aligned_alloc(p, size, align) \
+		xalloc_impl((size), region_aligned_alloc, (p), (size), (align))
+#define xregion_join(p, size)	xalloc_impl((size), region_join, (p), (size))
+#define xibuf_alloc(p, size)	xalloc_impl((size), ibuf_alloc, (p), (size))
+#define xibuf_reserve(p, size)	xalloc_impl((size), ibuf_reserve, (p), (size))
+#define xruntime_memory_alloc(size) \
+	xalloc_impl((size), runtime_memory_alloc, (size))
+#define xlsregion_alloc(p, size, id) \
+	xalloc_impl((size), lsregion_alloc, (p), (size), (id))
+#define xlsregion_aligned_alloc(p, size, align, id) \
+	xalloc_impl((size), lsregion_aligned_alloc, (p), (size), (align), (id))
+#define xlsregion_alloc_object(lsregion, id, T) ({				\
+	(T *)xlsregion_aligned_alloc((lsregion), sizeof(T), alignof(T), (id));	\
+})
+#define xlsregion_reserve(p, size) \
+	xalloc_impl((size), lsregion_reserve, (p), (size))
+#define xregion_alloc_object(region, T) ({					\
+	(T *)xregion_aligned_alloc((region), sizeof(T), alignof(T));		\
+})
+#define xregion_alloc_array(region, T, count) ({				\
+	(T *)xregion_aligned_alloc((region), sizeof(T) * (count), alignof(T));\
+})
+
+#define xobuf_alloc(p, size)	xalloc_impl((size), obuf_alloc, (p), (size))
+#define xobuf_reserve(p, size)	xalloc_impl((size), obuf_reserve, (p), (size))
+
+#define xobuf_dup(p, src, size)							\
+	({									\
+		size_t ret = obuf_dup((p), (src), (size));			\
+		if (unlikely(ret != (size_t)(size)))				\
+			alloc_failure(__FILE__, __LINE__, (size));		\
+	})
 
 /** \cond public */
 

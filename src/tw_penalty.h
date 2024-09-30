@@ -4,6 +4,8 @@
 #include "small/rlist.h"
 #include <stdbool.h>
 
+
+
 #define tw_penalty_attr \
     int idx;            \
     double a;		\

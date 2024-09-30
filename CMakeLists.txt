@@ -37,9 +37,11 @@ set (sources
     src/c_penalty.c
     src/customer.c
     src/distance.c
+    src/eama_solver.c
     src/ejection.c
     src/modification.c
     src/problem.c
+        src/problem_parser.cc
     src/random_utils.c
     src/route.c
     src/solution.cc

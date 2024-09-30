@@ -26,14 +26,23 @@ struct customer {
 	struct route *route;
 	struct rlist in_route;
     	struct rlist in_eject;
+	struct rlist in_opt_eject;
 };
 
 #define is_ejected(c) rlist_empty(&c->in_route)
+
+#if defined(__cplusplus)
+extern "C" {
+#endif /* defined(__cplusplus) */
 
 struct customer *
 customer_dup(struct customer *c);
 
 void
-customer_del(struct customer *c);
+customer_delete(struct customer *c);
+
+#if defined(__cplusplus)
+}
+#endif /* defined(__cplusplus) */
 
 #endif //EAMA_ROUTES_MINIMIZATION_HEURISTIC_CUSTOMER_H
