@@ -154,88 +154,88 @@ applicable(void)
 	m.type = TWO_OPT;
 	m.v = depot_tail(v_route);
 	m.w = cs[w_start + randint(0, w_route_len - 1)];
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
 	m.w = depot_tail(w_route);
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
 	m.w = cs[v_start + randint(0, v_route_len - 1)];
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = depot_head(v_route);
 	m.w = depot_head(w_route);
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
 	m.w = cs[w_start + randint(0, w_route_len - 1)];
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 
 	/** insert and out-relocate */
 	m.v = depot_head(v_route);
 	m.w = cs[w_start + randint(0, w_route_len - 1)];
 	m.type = INSERT;
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 	m.type = OUT_RELOCATE;
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
 	m.w = depot_head(w_route);
 	m.type = INSERT;
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 	m.type = OUT_RELOCATE;
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
 	m.w = cs[ep_start + randint(0, ep_len - 1)];
 	m.type = INSERT;
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 	m.type = OUT_RELOCATE;
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = depot_tail(v_route);
 	m.w = cs[w_start + randint(0, w_route_len - 1)];
 	m.type = INSERT;
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 	m.type = OUT_RELOCATE;
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
 	m.w = cs[w_start + randint(0, w_route_len - 1)];
 	m.type = INSERT;
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 	m.type = OUT_RELOCATE;
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 
 	/** eject */
 	m.type = EJECT;
 	m.v = depot_head(w_route);
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = cs[ep_start + randint(0, ep_len - 1)];
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 
 	/** exchange */
 	m.type = EXCHANGE;
 	m.v = depot_head(v_route);
 	m.w = cs[w_start + randint(0, w_route_len - 1)];
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 	m.v = depot_tail(v_route);
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
 	m.w = depot_head(w_route);
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 	m.w = depot_tail(w_route);
-	assert_neq(modification_applicable(m), 0);
+	assert(!modification_applicable(m));
 
 	m.v = cs[v_start + randint(0, v_route_len - 1)];
 	m.w = cs[w_start + randint(0, w_route_len - 1)];
-	assert_eq(modification_applicable(m), 0);
+	assert(modification_applicable(m));
 	return 0;
 }
 

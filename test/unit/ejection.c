@@ -94,8 +94,15 @@ ejections_random_route(int n_tests)
 {
 	memory_init();
 	fiber_init(fiber_c_invoke);
+
+	int64_t ps[MAX_N_CUSTOMERS_TEST];
+
 	for (int i = 0; i < n_tests; i++) {
 		generate_random_problem(MAX_N_CUSTOMERS_TEST);
+
+		for (int j = 0; j < MAX_N_CUSTOMERS_TEST; j++)
+			ps[j] = randint(0, 5);
+
 		struct route *route = route_new();
 		struct customer *w;
 		int j = 0;
@@ -115,7 +122,7 @@ ejections_random_route(int n_tests)
 			*f2 = fiber_new(feasible_ejections_f);
 
 		fiber_start(f1, p.n_customers, 5, &ejection_idx_exp);
-		fiber_start(f2, route, 5, &ejection_act, &p_best_act);
+		fiber_start(f2, route, 5, &ps[0], &ejection_act, &p_best_act);
 
 		rlist_persistent_history history;
 		rlist_create(&history);
@@ -134,7 +141,7 @@ ejections_random_route(int n_tests)
 			if (p_c < EPS5 && p_tw < EPS5) {
 				int64_t p_sum = 0;
 				rlist_foreach_entry(idx, &ejection_idx_exp, in_list)
-					p_sum += cs[idx->idx]->p;
+					p_sum += ps[cs[idx->idx]->id];
 				if (p_sum < p_best_exp) {
 					p_best_exp = p_sum;
 					assert(p_best_act == p_best_exp);

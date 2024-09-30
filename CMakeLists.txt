@@ -7,6 +7,7 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH}
 set(CMAKE_C_STANDARD 11)
 
 include(cmake/utils.cmake)
+include(cmake/compiler.cmake)
 include(cmake/SetFiberStackSize.cmake)
 
 #
@@ -35,14 +36,18 @@ add_subdirectory(src)
 
 set (sources
     src/c_penalty.c
+    src/cli.c
     src/customer.c
     src/distance.c
+    src/eama_solver.c
     src/ejection.c
     src/modification.c
     src/problem.c
+    src/problem_decode.cc
     src/random_utils.c
     src/route.c
     src/solution.cc
+    src/solution_encode.cc
     src/tw_penalty.c
     src/main.c
 )

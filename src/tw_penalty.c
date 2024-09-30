@@ -7,6 +7,7 @@
 #include "customer.h"
 #include "penalty_common.h"
 #include "problem.h"
+#include "route.h"
 #include "utils.h"
 
 void
@@ -144,7 +145,7 @@ tw_penalty_out_relocate_penalty_delta_slow
 	(struct customer *v, struct customer *w)
 {
 	assert(v->route == w->route);
-	struct modification m = {OUT_RELOCATE, v, w};
+	struct modification m = modification_new(OUT_RELOCATE, v, w);
 	return tw_penalty_modification_apply_straight_delta(m);
 }
 
@@ -171,7 +172,7 @@ tw_penalty_out_relocate_penalty_delta(struct customer *v, struct customer *w)
 double
 tw_penalty_exchange_penalty_delta_slow(struct customer *v, struct customer *w)
 {
-	struct modification m = {EXCHANGE, v, w};
+	struct modification m = modification_new(EXCHANGE, v, w);
 	return tw_penalty_modification_apply_straight_delta(m);
 }
 
