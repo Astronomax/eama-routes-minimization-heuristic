@@ -4,7 +4,6 @@
 #include <stdarg.h>
 
 #define feasible_ejections_attr	\
-	int64_t p;			\
 	/**
 	 * We don't want the customer::a calculated in tw_init_penalty to break
 	 * while iterating through feasible ejections.

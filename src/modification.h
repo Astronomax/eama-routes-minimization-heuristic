@@ -21,9 +21,17 @@ struct modification {
     struct customer *v;
     /** Used only in TWO_OPT, OUT_RELOCATE, EXCHANGE, INSERT */
     struct customer *w;
+    struct {
+	bool delta_initialized;
+	double tw_penalty_delta;
+	double c_penalty_delta;
+    };
 };
 
-int
+struct modification
+modification_new(enum modification_type type, struct customer *v, struct customer *w);
+
+bool
 modification_applicable(struct modification m);
 
 void

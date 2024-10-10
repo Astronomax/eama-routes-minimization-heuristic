@@ -13,7 +13,7 @@
 
 #define modify(modification_type, v, w) do {			\
         struct modification m = {modification_type, (v), (w)};	\
-        assert(modification_applicable(m) == 0);		\
+        assert(modification_applicable(m));			\
         modification_apply(m);					\
 } while(0)
 
