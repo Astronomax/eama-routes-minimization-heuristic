@@ -3,6 +3,10 @@
 
 #include "customer.h"
 
+#include "core/random.h"
+
+#define randint (int)pseudo_random_in_range
+
 #if defined(__cplusplus)
 extern "C" {
 #endif /* defined(__cplusplus) */

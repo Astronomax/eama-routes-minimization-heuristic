@@ -123,6 +123,10 @@ typedef int (*fiber_func)(va_list);
 struct fiber *
 fiber_new(fiber_func f);
 
+/** Free all fiber's resources and the fiber itself. */
+void
+fiber_delete(struct cord *cord, struct fiber *f);
+
 /**
  * Create a new fiber with defined attributes.
  *

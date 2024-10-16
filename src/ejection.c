@@ -10,8 +10,12 @@ feasible_ejections_f(va_list ap)
 {
 	struct route *r = va_arg(ap, struct route *);
 	int k_max = va_arg(ap, int);
+	int64_t *ps = va_arg(ap, int64_t *);
 	struct rlist *e = va_arg(ap, struct rlist *);
 	int64_t *p_best = va_arg(ap, int64_t *);
+
+	if (k_max <= 0)
+		return 0;
 
 	struct rlist ne, s;
 	rlist_create(&ne);
@@ -34,6 +38,9 @@ feasible_ejections_f(va_list ap)
 	struct customer *e_last;
 	struct customer *s_first = rlist_first_entry(&s, struct customer, in_eject);
 
+	//printf("route len: %d\n", route_len(r));
+	//fflush(stdout);
+
 	goto incr_k;
 	for(;;) {
 		if (/** Is better than current optimum */
@@ -52,13 +59,16 @@ feasible_ejections_f(va_list ap)
 
 		do {
 		/** backtrack */
-			if (unlikely(k == 1)) return 0;
+			//if (unlikely(k == 1)) return 0;
 
 			assert(e_last == rlist_last_entry(e, struct customer, in_eject));
 			s_first = e_last;
 			e_last = rlist_prev_entry(e_last, in_eject);
 			rlist_move_entry(&s, s_first, in_eject);
-			p_sum -= s_first->p;
+
+			if (unlikely(k == 1)) return 0;
+
+			p_sum -= ps[s_first->id];//p_sum -= s_first->p;
 			total_demand += s_first->demand;
 			rlist_foreach_entry_safe_reverse(ne_last, &ne, in_eject, tmp) {
 				if (ne_last->idx <= e_last->idx) break;
@@ -75,7 +85,7 @@ feasible_ejections_f(va_list ap)
 			ne_last = e_last;
 			//e_last = rlist_prev_entry(e_last, in_eject);
 			rlist_move_tail_entry(&ne, ne_last, in_eject);
-			p_sum -= ne_last->p;
+			p_sum -= ps[ne_last->id];//p_sum -= ne_last->p;
 			total_demand += ne_last->demand;
 			--k;
 		incr_k:
@@ -83,7 +93,7 @@ feasible_ejections_f(va_list ap)
 			e_last = s_first;
 			s_first = rlist_next_entry(s_first, in_eject);
 			rlist_move_tail_entry(e, e_last, in_eject);
-			p_sum += e_last->p;
+			p_sum += ps[e_last->id];//p_sum += e_last->p;
 			total_demand -= e_last->demand;
 			++k;
 		/** update */

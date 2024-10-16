@@ -6,8 +6,10 @@
 	double dist_sf
 
 #include "customer.h"
-#include "route.h"
+//#include "route.h"
 #include "utils.h"
+
+struct route;
 
 void
 distance_init(struct route *r);
