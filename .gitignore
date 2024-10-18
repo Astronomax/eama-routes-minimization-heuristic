@@ -1,7 +1,11 @@
 checkpatch
 cmake-build-debug
+cmake-build-relwithdebinfo
 debug-build
+release-build
 .idea
+GehringHomberger1000
+*.sol
 
 # Prerequisites
 *.d

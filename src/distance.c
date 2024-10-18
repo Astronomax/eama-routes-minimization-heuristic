@@ -3,6 +3,7 @@
 #include "assert.h"
 
 #include "dist.h"
+#include "route.h"
 
 void
 distance_init(struct route *r)

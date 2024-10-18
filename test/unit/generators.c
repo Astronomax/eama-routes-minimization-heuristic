@@ -14,7 +14,7 @@ generate_random_customer(void)
 	c->e = (double)real_random_in_range(0, 50);
 	c->l = c->e + (double)real_random_in_range(0, 50);
 	c->s = (double)real_random_in_range(0, 20);
-	c->p = (int)real_random_in_range(0, 5);
+	//c->p = (int)real_random_in_range(0, 5);
 	rlist_create(&c->in_route);
 	return c;
 }
@@ -56,7 +56,9 @@ generate_random_problem(int max_n_customers)
 	assert(max_n_customers >= 2);
 	p.n_customers =
 		(int)pseudo_random_in_range(2, max_n_customers);
-	for (int i = 0; i < p.n_customers; i++)
-		rlist_add_tail_entry(
-			&p.customers, generate_random_customer(), in_route);
+	for (int i = 0; i < p.n_customers; i++) {
+		struct customer *c = generate_random_customer();
+		c->id = i + 1;
+		rlist_add_tail_entry(&p.customers, c, in_route);
+	}
 }
